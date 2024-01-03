@@ -72,8 +72,7 @@ export abstract class LoggingSystem {
         newLogger.log = wrapFunction(newLogger.log.bind(newLogger), tempBufferFuncWrapper);
 
         // Provide the binder to add function caller to the logs.
-        //TODO: Figure out how to properly add the function caller without hitting callstack.
-        // newLogger.log = addFunctionCaller(newLogger, newLogger.log);
+        newLogger.log = addFunctionCaller(newLogger, newLogger.log);
         return newLogger;
     }
 }

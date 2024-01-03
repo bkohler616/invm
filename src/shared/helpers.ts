@@ -31,20 +31,18 @@ export const wrapFunction = <Func extends AnyFunction>(fn: Func, fnPre?: Functio
 };
 
 export function addFunctionCaller(binder: ThisParameterType<Function>, funcToWrap: AnyFunction) {
-    const stackTrace = new Error()?.stack?.split('\n')[2]?.trim().replace(/^at /, '');
     const preFunc: FunctionWrapOptions = {
         func: (...args) => {
+            const stackTrace = new Error()?.stack?.split('\n')[4]?.trim().replace(/^at /, '');
+            args.splice(1,0, stackTrace);
             return [
-                stackTrace,
                 ...args
             ]
         },
         modifiesReturnValue: true
     }
 
-    const newFuncWrap = wrapFunction(funcToWrap, preFunc);
-    newFuncWrap.bind(binder);
-    return newFuncWrap;
+    return wrapFunction(funcToWrap.bind(binder), preFunc);
 }
 
 /**
