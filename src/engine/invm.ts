@@ -1,61 +1,46 @@
-import {FileType} from "./enums/fileType";
+import {FileType} from "./file-state-managers/fileType";
 import {createAllocation, NewAllocation} from "./structure_interfaces/allocation";
+import {InventoryStateManager} from "./inv_state_manager";
+import {FileData} from "./file-state-managers/fileData";
 
 export class Invm {
-    private filePath?: string;
-    private fileType?: FileType;
+    private fileData: FileData;
+    private invState: InventoryStateManager;
     constructor(
-        filePath?: string,
-        fileType?: FileType
+        defaultLoc: FileData,
     ) {
-        if (filePath) {
-            this.filePath = filePath;
-        }
-        if (fileType) {
-            this.fileType = fileType;
-        }
+        this.fileData = defaultLoc;
+        this.invState = new InventoryStateManager();
     }
 
 
     //#region SaveData
     /**
      * Set a new save path.
-     * @param newFilePath
+     * @param newFileData
      */
-    setFilePath(newFilePath: string) {
-        this.filePath = newFilePath;
+    setFileData(newFileData: FileData) {
+        this.fileData = newFileData;
     }
 
-    /**
-     * Set the type of file desired to save.
-     * @param fileType
-     */
-    setFileType(fileType: FileType) {
-        this.fileType = fileType;
+    loadInvStateFromFileData() {
+        return this.invState.loadFromFileData(this.fileData);
     }
 
-    /**
-     * Export to a single location once
-     * @param filePath
-     * @param fileType
-     */
-    commitToTempLocation(filePath: string, fileType: FileType) {
-        console.log(filePath, fileType);
+    initializeInvStateFileData() {
+        return this.invState.initializeFileData(this.fileData);
     }
 
-    /**
-     * Force save of files.
-     */
-    commitToDisk() {
-
+    saveInvState() {
+        return this.invState.saveFileData(this.fileData);
     }
     //#endregion
+
+
 
     //#region AddData
     addAllocation(request: NewAllocation) {
         const alloc = createAllocation(request);
-
-
     }
 
     addCondition() {

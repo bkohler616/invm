@@ -1,7 +1,8 @@
 import yargs from 'yargs';
 import { Options } from 'yargs';
 import {defaultFileData} from "./defaults";
-import {Logger, LoggingSystem, LoggerSource} from "../engine/loggingSystem";
+import {Logger, LoggingSystem, LoggerSource} from "../shared/loggingSystem";
+import {Invm} from "../engine/invm";
 
 export class CliInterface {
     private testOptions: { [key: string]: Options; } = {
@@ -16,6 +17,7 @@ export class CliInterface {
     };
 
     private logger: Logger;
+    private invm: Invm;
 
 
     constructor() {
@@ -26,6 +28,8 @@ export class CliInterface {
         LoggingSystem.configure(false, logPath);
         this.logger = LoggingSystem.getLogger(LoggerSource.CliMain);
         this.logger.info('Starting up, parameters passed in are: ', argv);
+
+        this.invm = new Invm(defaultFileData);
     }
 }
 

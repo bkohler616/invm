@@ -1,4 +1,4 @@
-import {FileType} from "../engine/enums/fileType";
+import {FileType} from "../engine/file-state-managers/fileType";
 
 export const defaultFileData = {
     mainDirectoryPath: '~/.invm/',
