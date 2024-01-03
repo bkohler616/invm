@@ -4,7 +4,10 @@
   "description": "INVM - A node.js inventory manager",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run build-debug && node build/index.js -p 3 --ppp 4",
+    "build-debug": "tsc --project tsconfig.json",
+    "build": "npm run lint && tsc --project tsconfig.production.json",
+    "lint": "eslint src/**.*"
   },
   "repository": {
     "type": "git",
@@ -22,10 +25,18 @@
   },
   "homepage": "https://github.com/bkohler616/invm#readme",
   "dependencies": {
-    "yargs": "^17.7.2"
+    "yargs": "17.7.2"
   },
   "devDependencies": {
-    "@types/node": "^20.9.0",
-    "typescript": "^5.2.2"
+    "@types/node": "20.9.0",
+    "@types/yargs": "17.0.31",
+    "@typescript-eslint/eslint-plugin": "6.10.0",
+    "@typescript-eslint/parser": "6.10.0",
+    "eslint": "8.53.0",
+    "eslint-config-standard-with-typescript": "39.1.1",
+    "eslint-plugin-import": "2.29.0",
+    "eslint-plugin-n": "16.3.0",
+    "eslint-plugin-promise": "6.1.1",
+    "typescript": "5.2.2"
   }
 }
