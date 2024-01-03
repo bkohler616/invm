@@ -15,13 +15,13 @@ export class JsonFileManager {
      */
 
     private static defaultFileNames: fileNames = {
-        'allocations': 'allocations.json',
-        'checkins': 'checkins.json',
-        'checkouts': 'checkouts.json',
-        'conditions': 'conditions.json',
-        'items': 'items.json',
-        'packages': 'packages.json',
-        'tags': 'tags.json',
+        allocations: 'allocations.json',
+        checkins: 'checkins.json',
+        checkouts: 'checkouts.json',
+        conditions: 'conditions.json',
+        items: 'items.json',
+        packages: 'packages.json',
+        tags: 'tags.json',
     }
 
     private readonly declaredDataFileNames: fileNames = JsonFileManager.defaultFileNames;
@@ -35,12 +35,15 @@ export class JsonFileManager {
         };
 
         this.directories = folderNames;
-        this.logger = LoggingSystem.getLogger(LoggerSource.JsonFileManager);
+        this.logger = LoggingSystem.getLogger(this, LoggerSource.JsonFileManager);
     }
 
     //#region public initializers and checkers
+    /**
+     * Initialize the directories for invm engine to work.
+     */
     public async initialize(): Promise<void> {
-        this.logger = LoggingSystem.getLogger(LoggerSource.JsonFileManager);
+        this.logger = LoggingSystem.getLogger(this, LoggerSource.JsonFileManager);
         this.logger.info('Initializing file structure');
         try {
             await this.createDirectory("mainPath", this.directories.mainDirectoryPath);
@@ -53,24 +56,49 @@ export class JsonFileManager {
                 this.createDirectory('configDir', configDir)
             ]);
 
-            this.logger.info('Finished file initialization');
+            this.logger.info('Finished directory initialization');
         } catch (err) {
             this.logger.fatal(`Could not establish directories - ${err}`);
         }
     }
 
+    /**
+     * Determines if all files are loadable to perform a {@link getFileState}.
+     * Calls {@link isDataDirectorySetup} to ensure the data directory is established.
+     */
     public async isLoadable(): Promise<boolean> {
+        if(!await this.isDataDirectorySetup()) {
+            this.logger.debug('Data directory is not setup.');
+            return false;
+        }
         const dataDir = this.directories.mainDirectoryPath + this.directories.dataDirectory;
-        const pathsToCheck = [
-            this.directories.mainDirectoryPath,
-            this.directories.mainDirectoryPath + this.directories.configsDirectory,
-            this.directories.mainDirectoryPath + this.directories.logDirectory,
-            dataDir
-        ];
+        const pathsToCheck: string[] = [];
 
         Object.values(this.declaredDataFileNames).forEach((val) => {
             pathsToCheck.push(dataDir + val);
         });
+        return this.checkPaths(pathsToCheck);
+    }
+
+    /**
+     * Checks to see if the main and data directory exists.
+     */
+    public async isDataDirectorySetup() {
+        const dataDir = this.directories.mainDirectoryPath + this.directories.dataDirectory;
+        const pathsToCheck = [
+            this.directories.mainDirectoryPath,
+            dataDir
+        ];
+
+        return this.checkPaths(pathsToCheck);
+    }
+
+    /**
+     * Takes the paths provided and queries via {@link checkPathExists} to see if the path exists
+     * @param pathsToCheck {string[]}
+     * @private
+     */
+    private async checkPaths(pathsToCheck: string[]) {
         const checkingPromises: Promise<{ path: string, val: boolean }>[] = [];
         pathsToCheck.forEach((i) => {
             checkingPromises.push(this.checkPathExists(i));
@@ -92,6 +120,9 @@ export class JsonFileManager {
     //#endregion
 
     //#region Load
+    /**
+     * Collect the full {@link InventoryState} from the files declared at {@link declaredDataFileNames}
+     */
     public async getFullState() : Promise<InventoryState> {
         this.logger.info('Fetching data');
         this.logger.debug('Fetching data for paths: ', this.declaredDataFileNames);
@@ -123,6 +154,12 @@ export class JsonFileManager {
         });
     }
 
+    /**
+     * Get a singular file state for a specific type.
+     * @param path {string} - The path of the file to collect data from. Must be JSON.
+     * @param type {string} - The type of data to be collected - for logging purposes
+     * @private
+     */
     private getFileState(path: string, type: string): Promise<fileReadResults> {
         this.logger.debug(`Fetching for path '${path}' type '${type}' `);
         return new Promise((resolve, reject) => {
@@ -130,8 +167,7 @@ export class JsonFileManager {
                 this.logger.debug('Received', data, err);
                 if (err) {
                     this.logger.error('Failed to get file data!', err);
-                    reject(err);
-                    return;
+                    return reject(err);
                 }
                 this.logger.info(`Collected file ${path}; ${type}`);
                 resolve({data: JSON.parse(data), type});
@@ -141,11 +177,15 @@ export class JsonFileManager {
     //#endregion
 
     //#region Save
+    /**
+     * Save the full inventory state to the {@link declaredDataFileNames} paths.
+     * @param state {InventoryState} - The state to write to record to all files.
+     */
     public saveFullState(state: InventoryState): Promise<void> {
         const allFiles: Promise<void>[] = [];
         Object.keys(state).forEach((key) => {
             if (state[key]) {
-                allFiles.push(this.saveItemState(this.declaredDataFileNames[key], state[key])
+                allFiles.push(this.saveObjectState(this.declaredDataFileNames[key], state[key])
                     .catch((err) => {
                         this.logger.error(`When saving ${key}, we got an error`, err);
                     }));
@@ -156,7 +196,13 @@ export class JsonFileManager {
         });
     }
 
-    private saveItemState(path: string, state: object[] | undefined): Promise<void> {
+    /**
+     * Save a state object array to a path.
+     * @param path {string} - Path on where to save the file
+     * @param state {object[]} - The object to record
+     * @private
+     */
+    private saveObjectState(path: string, state: object[] | undefined): Promise<void> {
         if (!path || !state || !state.length) {
             this.logger.error('One of the provided items are invalid', path, state);
             return Promise.reject('The provided path or state is invalid');
@@ -164,7 +210,7 @@ export class JsonFileManager {
         return new Promise((resolve, reject) => {
             fs.writeFile(path, JSON.stringify(state), (err) => {
                 if (err) {
-                    reject(err);
+                    return reject(err);
                 }
                 resolve();
             });
@@ -173,32 +219,43 @@ export class JsonFileManager {
     //#endregion
 
     //#region directory helpers
+    /**
+     * Creates a directory at the specified path. Calls {@link fs.existsSync} to check if it exists already, and uses {@link fs.mkdir} to create the directory
+     * @param pathName {string} - Friendly path name for logging
+     * @param path {string} - The path to create/
+     * @private
+     */
     private createDirectory(pathName: string, path: string): Promise<void> {
         return new Promise<void>((res, rej) => {
-            if (!fs.existsSync(this.directories.mainDirectoryPath)) {
-                this.logger.warn(`Path "${pathName}" was not found; creating ${path}`);
-                fs.mkdir(this.directories.mainDirectoryPath, (err) => {
+            if (!fs.existsSync(path)) {
+                this.logger.warn(`PathName "${pathName}" was not found; creating ${path}`);
+                fs.mkdir(path, (err) => {
                     if (err) {
-                        this.logger.error('Failed to create mainPath directory', err);
-                        rej(err);
+                        this.logger.error(`Failed to create ${pathName} directory`, err);
+                        return rej(err);
                     }
-                    this.logger.info('Created mainPath directory');
-                    res();
+                    this.logger.info(`Created ${pathName} directory`);
+                    return res();
                 });
             } else {
-                this.logger.debug('Found mainPath directory');
-                res();
+                this.logger.debug(`Found ${pathName} ; ${path} directory`);
+                return res();
             }
         });
     }
 
+    /**
+     * Checks if the specified path exists by using {@link fs.access}.
+     * @param path {string}
+     * @private
+     */
     private checkPathExists(path: string): Promise<{path: string, val: boolean}> {
         return new Promise((resolve) => {
             fs.access(path, (err) => {
                 if (err) {
                     this.logger.debug(`On checking ${path}, received: `, err);
                 }
-                resolve({path: path, val: !!err});
+                resolve({path: path, val: !err});
             });
         });
     }

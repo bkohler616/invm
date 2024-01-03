@@ -1,5 +1,3 @@
-import {FileType} from "./file-state-managers/fileType";
-import {createAllocation, NewAllocation} from "./structure_interfaces/allocation";
 import {InventoryStateManager} from "./inv_state_manager";
 import {FileData} from "./file-state-managers/fileData";
 
@@ -39,8 +37,8 @@ export class Invm {
 
 
     //#region AddData
-    addAllocation(request: NewAllocation) {
-        const alloc = createAllocation(request);
+    addAllocation() {
+        // const alloc = createAllocation(request);
     }
 
     addCondition() {

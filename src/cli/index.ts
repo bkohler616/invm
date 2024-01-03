@@ -21,15 +21,21 @@ export class CliInterface {
 
 
     constructor() {
+        const logPath = defaultFileData.mainDirectoryPath + defaultFileData.logDirectory + defaultFileData.logFile;
+        LoggingSystem.configure(false, logPath);
+        this.logger = LoggingSystem.getLogger(this, LoggerSource.CliMain);
+        this.logger.debug('Started up logging system');
+
+        this.invm = new Invm(defaultFileData);
+    }
+
+    public async startCli() {
         const argv = yargs(process.argv.slice(2)).options(this.testOptions).parseSync();
         console.log('(%d,%d)', argv.p, argv.ppp);
         console.log(JSON.stringify(argv));
-        const logPath = defaultFileData.mainDirectoryPath + defaultFileData.logDirectory;
-        LoggingSystem.configure(false, logPath);
-        this.logger = LoggingSystem.getLogger(LoggerSource.CliMain);
-        this.logger.info('Starting up, parameters passed in are: ', argv);
 
-        this.invm = new Invm(defaultFileData);
+        this.logger.info('Starting up, parameters passed in are: ', argv);
+        await this.invm.initializeInvStateFileData();
     }
 }
 

@@ -1,7 +1,7 @@
 import * as log4js from 'log4js';
 import {Level, Logger} from "log4js";
+import {addFunctionCaller, FunctionWrapOptions, wrapFunction} from "./helpers";
 
-type AnyFunction = (...args: any[]) => any;
 
 type logType = {
     level?: Level,
@@ -53,27 +53,29 @@ export abstract class LoggingSystem {
         this.storeTempBuffer = [];
     }
 
-    public static getLogger(logger: LoggerSource) {
+    public static getLogger(binder: ThisParameterType<Function>, logger: LoggerSource) {
         if (!log4js.isConfigured()) {
             this.configure();
         }
         const newLogger = log4js.getLogger(logger);
-        newLogger.log = this.wrap(newLogger.log);
+        const tempBufferFuncWrapper: FunctionWrapOptions = {
+            func: (...args) => {
+                if (this.storeTemp) {
+                    this.storeTempBuffer.push({...args});
+                }
+            }
+        };
+        // Bind to this so `this.storeTemp` and `this.storeTempBuffer` is valid
+        tempBufferFuncWrapper.func.bind(this);
+
+        // Bind the newLogger.log to itself to not lose `this` context when passing
+        newLogger.log = wrapFunction(newLogger.log.bind(newLogger), tempBufferFuncWrapper);
+
+        // Provide the binder to add function caller to the logs.
+        //TODO: Figure out how to properly add the function caller without hitting callstack.
+        // newLogger.log = addFunctionCaller(newLogger, newLogger.log);
         return newLogger;
     }
-
-    /**
-     * Wrap a function, store data into @storeTempBuffer if @storeTemp is set for flushing later.
-     * @param fn
-     */
-    private static wrap = <Func extends AnyFunction>(fn: Func): ((...args: Parameters<Func>) => ReturnType<Func>) => {
-        return (...args: Parameters<Func>): ReturnType<Func> => {
-            if (this.storeTemp) {
-
-            }
-            return fn(...args);
-        };
-    };
 }
 
 
@@ -87,6 +89,8 @@ export enum LoggerSource {
     JsonFileManager = 'JsonFileManager',
     ZipFileManager = 'ZipFileManager',
     CliMain = 'CLI-Main',
+    InvmFatalHandler = 'InvmFatalHandler',
+    InvmStateManager = 'InvmStateManager',
 }
 
 export {Logger} from "log4js";

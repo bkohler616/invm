@@ -1,13 +1,9 @@
-import {Allocation} from "./structure_interfaces";
-import {Condition} from "./structure_interfaces";
-import {Item} from "./structure_interfaces";
-import {Package} from "./structure_interfaces";
-import {Tag} from "./structure_interfaces";
-import {Checkout} from "./structure_interfaces";
-import {Checkin} from "./structure_interfaces";
+import {Allocation, Checkin, Checkout, Condition, Item, Package, Tag} from "./structure_interfaces";
 import {FileData} from "./file-state-managers/fileData";
 import {FileType} from "./file-state-managers/fileType";
 import {JsonFileManager} from "./file-state-managers/jsonFileManager";
+import {Logger} from "log4js";
+import {LoggerSource, LoggingSystem} from "../shared/loggingSystem";
 
 export class InventoryStateManager {
     private invmState: InventoryState = {
@@ -19,10 +15,15 @@ export class InventoryStateManager {
         checkouts: [],
         checkins: [],
     }
+    private logger: Logger;
     constructor(initialState?: InventoryState) {
         if (initialState) {
             this.invmState = initialState;
         }
+        this.logger = LoggingSystem.getLogger(this, LoggerSource.InvmStateManager);
+        this.logger.info('using it!');
+
+
     }
 
     //#region Public file functions
@@ -42,9 +43,13 @@ export class InventoryStateManager {
         return this.initializeJsonFiles(fileData);
     }
 
-    public saveFileData(fileData: FileData, force: boolean = false): Promise<void> {
+    public saveFileData(fileData: FileData, force: boolean = false, overwriteStateToSave?: InventoryState): Promise<void> {
         if (fileData.fileType !== FileType.JSON) {
             throw `File type ${fileData.fileType} not supported`;
+        }
+
+        if (overwriteStateToSave) {
+            this.invmState = overwriteStateToSave;
         }
 
         return this.saveJsonFiles(fileData, force);
@@ -54,7 +59,7 @@ export class InventoryStateManager {
     //#region JSON file handlers
     private saveJsonFiles(fileData: FileData, force: boolean = false): Promise<void> {
         const jsonFileMan = new JsonFileManager(fileData);
-        return jsonFileMan.isLoadable()
+        return jsonFileMan.isDataDirectorySetup()
             .then((val) => {
                 if (val && !force) {
                     throw 'Data already exists, did not save';
@@ -81,10 +86,11 @@ export class InventoryStateManager {
         const jsonFileMan = new JsonFileManager(fileData);
         return jsonFileMan.isLoadable()
             .then((val) => {
-                if (!val && !force) {
+                if (val && !force) {
                     throw 'Data already exists, did not re-initialize';
                 }
-                return jsonFileMan.initialize();
+                return jsonFileMan.initialize()
+                    .then(() => this.saveJsonFiles(fileData, true));
             });
     }
     //#endregion
