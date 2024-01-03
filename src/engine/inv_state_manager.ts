@@ -21,7 +21,7 @@ export class InventoryStateManager {
             this.invmState = initialState;
         }
         this.logger = LoggingSystem.getLogger(this, LoggerSource.InvmStateManager);
-        this.logger.info('using it!');
+        this.logger.trace('using it!');
 
 
     }

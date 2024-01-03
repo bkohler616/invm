@@ -105,12 +105,12 @@ export class JsonFileManager {
         })
         const values_1 = await Promise.all(checkingPromises);
         if (values_1.find((i_1) => !i_1.val)) {
-            this.logger.info('Not all paths were valid');
+            this.logger.warn('Not all paths were valid');
             values_1.forEach((i_2) => {
                 if (i_2.val) {
-                    this.logger.debug(`Path ${i_2.path} - ${i_2.val}`);
+                    this.logger.trace(`Path ${i_2.path} - ${i_2.val}`);
                 } else {
-                    this.logger.warn(`Path ${i_2.path} does not exist`);
+                    this.logger.debug(`Path ${i_2.path} does not exist`);
                 }
             });
             return false;
@@ -144,7 +144,7 @@ export class JsonFileManager {
         };
 
         const allFiles = await Promise.all(promiseArray);
-        this.logger.info('Collected data! pushing into new object!');
+        this.logger.info('Collected data!');
         this.logger.debug('Final object list', allFiles);
         return allFiles.reduce((previousValue: InventoryState, currentValue: fileReadResults) => {
             const newObj = previousValue;
@@ -168,7 +168,7 @@ export class JsonFileManager {
                     this.logger.error('Failed to get file data!', err);
                     return reject(err);
                 }
-                this.logger.info(`Collected file ${path}; ${type}`);
+                this.logger.debug(`Collected file ${path}; ${type}`);
                 resolve({data: JSON.parse(data), type});
             });
         });
@@ -232,7 +232,7 @@ export class JsonFileManager {
                         this.logger.error(`Failed to create ${pathName} directory`, err);
                         return rej(err);
                     }
-                    this.logger.info(`Created ${pathName} directory`);
+                    this.logger.debug(`Created ${pathName} directory`);
                     return res();
                 });
             } else {
