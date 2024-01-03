@@ -131,3 +131,7 @@ dist
 
 # tsc build
 build/
+
+# intellij
+.idea/
+

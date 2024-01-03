@@ -27,7 +27,7 @@ export abstract class LoggingSystem {
         }
 
         if (fileLocation) {
-            logConfiguration.appenders.file = {
+            logConfiguration.appenders['file'] = {
                 type: 'file',
                 filename: fileLocation,
                 maxLogSize: 10 * 1024 * 1024, // = 10Mb
@@ -53,7 +53,7 @@ export abstract class LoggingSystem {
         this.storeTempBuffer = [];
     }
 
-    public static getLogger(binder: ThisParameterType<Function>, logger: LoggerSource) {
+    public static getLogger(logger: LoggerSource) {
         if (!log4js.isConfigured()) {
             this.configure();
         }

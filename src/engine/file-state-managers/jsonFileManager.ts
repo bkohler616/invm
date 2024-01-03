@@ -35,7 +35,7 @@ export class JsonFileManager {
         };
 
         this.directories = folderNames;
-        this.logger = LoggingSystem.getLogger(this, LoggerSource.JsonFileManager);
+        this.logger = LoggingSystem.getLogger(LoggerSource.JsonFileManager);
     }
 
     //#region public initializers and checkers
@@ -43,7 +43,7 @@ export class JsonFileManager {
      * Initialize the directories for invm engine to work.
      */
     public async initialize(): Promise<void> {
-        this.logger = LoggingSystem.getLogger(this, LoggerSource.JsonFileManager);
+        this.logger = LoggingSystem.getLogger(LoggerSource.JsonFileManager);
         this.logger.info('Initializing file structure');
         try {
             await this.createDirectory("mainPath", this.directories.mainDirectoryPath);

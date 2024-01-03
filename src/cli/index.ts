@@ -4,15 +4,24 @@ import {defaultFileData} from "./defaults";
 import {Logger, LoggingSystem, LoggerSource} from "../shared/loggingSystem";
 import {Invm} from "../engine/invm";
 
+enum commands {
+    ADD,
+    REMOVE,
+    FIND,
+    LIST,
+    CHECKIN,
+    CHECKOUT
+}
 export class CliInterface {
     private testOptions: { [key: string]: Options; } = {
-        p: {
-            type: "string",
-            default: false
+        run: {
+            type: "boolean",
+            default: true,
+            hidden: true,
         },
-        ppp: {
+        type: {
             type: "string",
-            default: false
+            choices: ["allocation", "condition", "item", "package", "tag"]
         }
     };
 
@@ -23,37 +32,62 @@ export class CliInterface {
     constructor() {
         const logPath = defaultFileData.mainDirectoryPath + defaultFileData.logDirectory + defaultFileData.logFile;
         LoggingSystem.configure(false, logPath);
-        this.logger = LoggingSystem.getLogger(this, LoggerSource.CliMain);
-        this.logger.trace('Started up logging system');
-
+        this.logger = LoggingSystem.getLogger(LoggerSource.CliMain);
+        this.logger.trace('Started up logging system in CLI');
         this.invm = new Invm(defaultFileData);
+    }
+
+    public async startCli() {
         const argvv = yargs(process.argv.slice(2))
             .options(this.testOptions)
             .scriptName('invm')
             .usage('$0 <cmd> [args]')
-            .command({
+            .command([{
                 command: 'add <type> [value]',
-                describe: 'description',
-                builder: (yargs) => yargs.default('value', 'true'),
+                aliases: ['create', 'a', 'c'],
+                describe: 'Add a <type> with [key=value]s to the inventory system',
                 handler: (argv) => {
-                    console.log(`setting ${argv.type}`);
+                    this.handle(argv, commands.ADD);
                 },
-            })
+            }, {
+                command: 'remove <type> [value]',
+                aliases: ['delete', 'r', 'd'],
+                describe: 'Remove a <type> with a specific value',
+                handler: (argv) => {
+                    this.logger.debug(`REMOVE - ${JSON.stringify(argv)}`);
+                },
+            }, {
+                command: 'find <type> [value]',
+                aliases: ['search', 'query', 's', 'q', 'f'],
+                describe: 'Find a <type> with a specific value',
+                handler: (argv) => {
+                    this.logger.debug(`FIND -  ${JSON.stringify(argv)}`);
+                },
+            }, {
+                command: 'list <type> [value]',
+                aliases: ['l'],
+                describe: 'List a <type>',
+                handler: (argv) => {
+                    this.logger.debug(`LIST -  ${JSON.stringify(argv)}`);
+                },
+            }])
             .help()
             .recommendCommands()
             .demandCommand()
-            .argv;
-        console.log('Hi!');
-        console.log(argvv);
+            .parseSync()
+        if (!argvv['run']) {
+            console.log('Closing due to run being false.');
+            process.exit();
+        }
+
+        await this.invm.initializeInvStateFileData();
     }
 
-    public async startCli() {
-        // const argv = yargs(process.argv.slice(2)).options(this.testOptions).parseSync();
-        // console.log('(%d,%d)', argv.p, argv.ppp);
-        // console.log(JSON.stringify(argv));
-        //
-        // this.logger.info('Starting up, parameters passed in are: ', argv);
-        await this.invm.initializeInvStateFileData();
+    private handle(argv: yargs.ArgumentsCamelCase, command: commands ) {
+        this.logger.debug(`${command} - ${JSON.stringify(argv)}`);
+        if (command === commands.ADD) {
+
+        }
     }
 }
 
