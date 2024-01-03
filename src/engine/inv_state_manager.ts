@@ -57,42 +57,34 @@ export class InventoryStateManager {
     //#endregion
 
     //#region JSON file handlers
-    private saveJsonFiles(fileData: FileData, force: boolean = false): Promise<void> {
+    private async saveJsonFiles(fileData: FileData, force: boolean = false): Promise<void> {
         const jsonFileMan = new JsonFileManager(fileData);
-        return jsonFileMan.isDataDirectorySetup()
-            .then((val) => {
-                if (val && !force) {
-                    throw 'Data already exists, did not save';
-                }
-                if (!val) {
-                    return this.initializeJsonFiles(fileData, true);
-                }
-                return
-            }).then(() => {
-                return jsonFileMan.saveFullState(this.invmState);
-            });
+        let isSetup = await jsonFileMan.isDataDirectorySetup();
+        if (isSetup && !force) {
+            throw 'Data already exists, did not save';
+        }
+        if (!isSetup) {
+            await this.initializeJsonFiles(fileData, true);
+        }
+        return jsonFileMan.saveFullState(this.invmState);
     }
 
-    private loadFromJsonFiles(fileData: FileData): Promise<void> {
+    private async loadFromJsonFiles(fileData: FileData): Promise<void> {
         const jsonFileMan = new JsonFileManager(fileData);
-        return jsonFileMan.isLoadable()
-            .then((val) => val ? jsonFileMan.getFullState(): Promise.reject("Could not load"))
-            .then((val) => {
-                this.invmState = val;
-            });
+        const isLoadable = await jsonFileMan.isLoadable();
+        this.invmState = await (isLoadable ? jsonFileMan.getFullState() : Promise.reject("Could not load"));
     }
 
-    private initializeJsonFiles(fileData: FileData, force: boolean = false): Promise<void> {
+    private async initializeJsonFiles(fileData: FileData, force: boolean = false): Promise<void> {
         const jsonFileMan = new JsonFileManager(fileData);
-        return jsonFileMan.isLoadable()
-            .then((val) => {
-                if (val && !force) {
-                    throw 'Data already exists, did not re-initialize';
-                }
-                return jsonFileMan.initialize()
-                    .then(() => this.saveJsonFiles(fileData, true));
-            });
+        let isLoadable = await jsonFileMan.isLoadable();
+        if (isLoadable && !force) {
+            throw 'Data already exists, did not re-initialize';
+        }
+        await jsonFileMan.initialize();
+        return await this.saveJsonFiles(fileData, true);
     }
+
     //#endregion
 
 

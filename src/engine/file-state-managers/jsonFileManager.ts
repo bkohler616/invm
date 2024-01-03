@@ -123,7 +123,7 @@ export class JsonFileManager {
     /**
      * Collect the full {@link InventoryState} from the files declared at {@link declaredDataFileNames}
      */
-    public async getFullState() : Promise<InventoryState> {
+    public async getFullState(): Promise<InventoryState> {
         this.logger.info('Fetching data');
         this.logger.debug('Fetching data for paths: ', this.declaredDataFileNames);
 
@@ -143,15 +143,14 @@ export class JsonFileManager {
             checkins: [],
         };
 
-        return Promise.all(promiseArray).then((allFiles) => {
-            this.logger.info('Collected data! pushing into new object!');
-            this.logger.debug('Final object list', allFiles);
-            return allFiles.reduce((previousValue: InventoryState, currentValue: fileReadResults) => {
-                const newObj = previousValue;
-                newObj[currentValue.type] = currentValue.data;
-                return newObj;
-            }, invmState);
-        });
+        const allFiles = await Promise.all(promiseArray);
+        this.logger.info('Collected data! pushing into new object!');
+        this.logger.debug('Final object list', allFiles);
+        return allFiles.reduce((previousValue: InventoryState, currentValue: fileReadResults) => {
+            const newObj = previousValue;
+            newObj[currentValue.type] = currentValue.data;
+            return newObj;
+        }, invmState);
     }
 
     /**
@@ -181,7 +180,7 @@ export class JsonFileManager {
      * Save the full inventory state to the {@link declaredDataFileNames} paths.
      * @param state {InventoryState} - The state to write to record to all files.
      */
-    public saveFullState(state: InventoryState): Promise<void> {
+    public async saveFullState(state: InventoryState): Promise<void> {
         const allFiles: Promise<void>[] = [];
         Object.keys(state).forEach((key) => {
             if (state[key]) {
@@ -191,9 +190,8 @@ export class JsonFileManager {
                     }));
             }
         });
-        return Promise.all(allFiles).then(() => {
-            this.logger.info('Saving has completed');
-        });
+        await Promise.all(allFiles);
+        this.logger.info('Saving has completed');
     }
 
     /**
