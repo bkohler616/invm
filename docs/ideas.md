@@ -141,7 +141,6 @@
 {
 	...[[#Generic audit fields]],
 	...[[#Generic Fields]],
-	"description": "string",
 	"tags": ["list_of_tags"],
 	"importance": 0-10,
     "sub-allocation": "allocation_id",
