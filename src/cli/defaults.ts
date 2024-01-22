@@ -1,11 +1,13 @@
-import {FileType} from "../engine/file-state-managers/fileType";
+import {FileType} from '../engine/file-state-managers/fileType';
 
-const homedir = require('os').homedir();
+import {homedir} from 'os';
+
+const homeDirectory = homedir();
 export const defaultFileData = {
-    mainDirectoryPath: `${homedir}/.invm/`,
+    mainDirectoryPath: `${homeDirectory}/.invm/`,
     fileType: FileType.JSON,
     configsDirectory: 'configs/',
     dataDirectory: 'data/',
     logDirectory: 'logs/',
     logFile: 'invm.log',
-}
+};

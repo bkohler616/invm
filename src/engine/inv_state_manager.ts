@@ -16,6 +16,7 @@ export class InventoryStateManager {
         checkins: [],
     }
     private logger: Logger;
+
     constructor(initialState?: InventoryState) {
         if (initialState) {
             this.invmState = initialState;
@@ -54,6 +55,7 @@ export class InventoryStateManager {
 
         return this.saveJsonFiles(fileData, force);
     }
+
     //#endregion
 
     //#region JSON file handlers
@@ -98,5 +100,6 @@ export interface InventoryState {
     tags: Tag[],
     checkouts: Checkout[],
     checkins: Checkin[],
+
     [keys: string]: object[],
 }

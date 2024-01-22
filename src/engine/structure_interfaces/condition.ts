@@ -1,16 +1,18 @@
 import {GeneralFields} from "./generalFields";
-import {AuditFields, NewAuditFields} from "./auditFields";
 import * as AuditData from "./auditFields";
+import {AuditFields, NewAuditFields} from "./auditFields";
 
 export let DefaultCostModifier = 100;
 export let DefaultImportanceModifier = 5;
 export let DefaultColor = '#6fa8dc';
+
 export interface Condition extends GeneralFields, AuditFields {
     tags: string[], // tag ids
     color: string, // hex rgb
     importance: number, // 0-10
     cost_modifier: number // percentage of item value modifier
 }
+
 export interface NewCondition extends GeneralFields, NewAuditFields {
     tags?: string[],
     color?: string,

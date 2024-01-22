@@ -1,7 +1,7 @@
 /**
  * Typing for the {@link wrapFunction}
  */
-export type AnyFunctionSpreadable = (...args: any[]) => any[]|void;
+export type AnyFunctionSpreadable = (...args: any[]) => any[] | void;
 export type AnyFunction = (...args: any[]) => any;
 
 /**

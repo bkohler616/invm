@@ -4,6 +4,7 @@ import {FileData} from "./file-state-managers/fileData";
 export class Invm {
     private fileData: FileData;
     private invState: InventoryStateManager;
+
     constructor(
         defaultLoc: FileData,
     ) {
@@ -32,8 +33,8 @@ export class Invm {
     saveInvState() {
         return this.invState.saveFileData(this.fileData);
     }
-    //#endregion
 
+    //#endregion
 
 
     //#region AddData
@@ -79,6 +80,7 @@ export class Invm {
     getPackage() {
 
     }
+
     //#endregion
 
     //#region UpdateData
@@ -101,6 +103,7 @@ export class Invm {
     updatePackage() {
 
     }
+
     //#endregion
 
     //#region Checkin/Checkout
@@ -127,6 +130,7 @@ export class Invm {
     deletePackage() {
 
     }
+
     //#endregion
 
     //#region PermanentlyDeleteData

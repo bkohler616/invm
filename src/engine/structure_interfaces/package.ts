@@ -1,13 +1,13 @@
 import {GeneralFields} from "./generalFields";
-import {AuditFields, NewAuditFields} from "./auditFields";
 import * as AuditData from "./auditFields";
+import {AuditFields, NewAuditFields} from "./auditFields";
 
-export interface Package extends GeneralFields, AuditFields{
+export interface Package extends GeneralFields, AuditFields {
     items: string[], // item_ids
     tags: string[], // tag_ids
 }
 
-export interface NewPackage extends GeneralFields, NewAuditFields{
+export interface NewPackage extends GeneralFields, NewAuditFields {
     items?: string[], // item_ids
     tags?: string[], // tag_ids
 }

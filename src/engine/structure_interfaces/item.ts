@@ -1,7 +1,8 @@
+import * as AuditData from "./auditFields";
 import {AuditFields, NewAuditFields} from "./auditFields";
 import {GeneralFields} from "./generalFields";
-import * as AuditData from "./auditFields";
 import {DefaultAllocationImportance} from "./allocation";
+
 export interface Item extends AuditFields, GeneralFields {
     tags: string[], //tag_ids
     current_allocation: string, // item's current allocation

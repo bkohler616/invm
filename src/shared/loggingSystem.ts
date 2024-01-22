@@ -1,30 +1,31 @@
 import * as log4js from 'log4js';
-import {Level, Logger} from "log4js";
-import {addFunctionCaller, FunctionWrapOptions, wrapFunction} from "./helpers";
+import {Level, Logger} from 'log4js';
+import {addFunctionCaller, FunctionWrapOptions, wrapFunction} from './helpers';
 
 
 type logType = {
     level?: Level,
-    [prop: string]: any
-};
+    [index: string]: unknown
+}
 
 export abstract class LoggingSystem {
     private static storeTemp = true;
     private static storeTempBuffer: logType[];
+
     public static configure(storeTemp = true, fileLocation?: string) {
         const logConfiguration: log4js.Configuration = {
             appenders: {
                 out: {
-                    type: "stdout"
+                    type: 'stdout'
                 }
             },
             categories: {
                 default: {
-                    appenders: ["out", "file"],
-                    level: "debug",
+                    appenders: ['out', 'file'],
+                    level: 'debug',
                 }
             }
-        }
+        };
 
         if (fileLocation) {
             logConfiguration.appenders['file'] = {
@@ -34,7 +35,7 @@ export abstract class LoggingSystem {
                 backups: 5, // keep five backup files
                 compress: true, // compress the backups
                 encoding: 'utf-8',
-            }
+            };
         }
         log4js.configure(logConfiguration);
         if (this.storeTempBuffer) {
@@ -92,4 +93,4 @@ export enum LoggerSource {
     InvmStateManager = 'InvmStateManager',
 }
 
-export {Logger} from "log4js";
+export {Logger} from 'log4js';

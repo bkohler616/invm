@@ -2,6 +2,7 @@ import * as AuditData from './auditFields';
 import {GeneralFields} from "./generalFields";
 
 export let DefaultAllocationImportance = 5;
+
 export interface Allocation extends AuditData.AuditFields, GeneralFields {
     tags: string[], //tag ids
     importance: number, // 0-10

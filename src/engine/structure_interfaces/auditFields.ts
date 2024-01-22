@@ -7,7 +7,7 @@ export interface AuditFields {
     date_added: string, // Date when added (toISOString)
     date_modified: string[], // list of dates this was modified (toISOString)
     added_by: addedBy, // system this was added by
-    last_modified_by? : addedBy, //system this was last modified by
+    last_modified_by?: addedBy, //system this was last modified by
     is_removed: boolean, // is the item removed / should not be shown in basic queries
     date_removed?: string, // date this item was removed (toISOString)
     removed_reason?: string // reason for removal

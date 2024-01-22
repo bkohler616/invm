@@ -1,4 +1,4 @@
-import {FileType} from "./fileType";
+import {FileType} from './fileType';
 
 export interface FileData {
     mainDirectoryPath: string,

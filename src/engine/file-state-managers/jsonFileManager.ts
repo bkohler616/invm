@@ -1,8 +1,8 @@
-import {InventoryState} from "../inv_state_manager";
+import {InventoryState} from '../inv_state_manager';
 import 'fs';
-import * as fs from "fs";
-import {Logger, LoggerSource, LoggingSystem} from "../../shared/loggingSystem";
-import {FileData} from "./fileData";
+import * as fs from 'fs';
+import {Logger, LoggerSource, LoggingSystem} from '../../shared/loggingSystem';
+import {FileData} from './fileData';
 
 interface fileReadResults {
     data: object[],
@@ -22,7 +22,7 @@ export class JsonFileManager {
         items: 'items.json',
         packages: 'packages.json',
         tags: 'tags.json',
-    }
+    };
 
     private readonly declaredDataFileNames: fileNames = JsonFileManager.defaultFileNames;
     private readonly directories: FileData;
@@ -46,7 +46,7 @@ export class JsonFileManager {
         this.logger = LoggingSystem.getLogger(LoggerSource.JsonFileManager);
         this.logger.info('Initializing file structure');
         try {
-            await this.createDirectory("mainPath", this.directories.mainDirectoryPath);
+            await this.createDirectory('mainPath', this.directories.mainDirectoryPath);
             const dataDir = this.directories.mainDirectoryPath + this.directories.dataDirectory;
             const logsDir = this.directories.mainDirectoryPath + this.directories.logDirectory;
             const configDir = this.directories.mainDirectoryPath + this.directories.configsDirectory;
@@ -67,7 +67,7 @@ export class JsonFileManager {
      * Calls {@link isDataDirectorySetup} to ensure the data directory is established.
      */
     public async isLoadable(): Promise<boolean> {
-        if(!await this.isDataDirectorySetup()) {
+        if (!await this.isDataDirectorySetup()) {
             this.logger.debug('Data directory is not setup.');
             return false;
         }
@@ -93,32 +93,6 @@ export class JsonFileManager {
         return this.checkPaths(pathsToCheck);
     }
 
-    /**
-     * Takes the paths provided and queries via {@link checkPathExists} to see if the path exists
-     * @param pathsToCheck {string[]}
-     * @private
-     */
-    private async checkPaths(pathsToCheck: string[]) {
-        const checkingPromises: Promise<{ path: string, val: boolean }>[] = [];
-        pathsToCheck.forEach((i) => {
-            checkingPromises.push(this.checkPathExists(i));
-        })
-        const values_1 = await Promise.all(checkingPromises);
-        if (values_1.find((i_1) => !i_1.val)) {
-            this.logger.warn('Not all paths were valid');
-            values_1.forEach((i_2) => {
-                if (i_2.val) {
-                    this.logger.trace(`Path ${i_2.path} - ${i_2.val}`);
-                } else {
-                    this.logger.debug(`Path ${i_2.path} does not exist`);
-                }
-            });
-            return false;
-        }
-        return true;
-    }
-    //#endregion
-
     //#region Load
     /**
      * Collect the full {@link InventoryState} from the files declared at {@link declaredDataFileNames}
@@ -133,7 +107,7 @@ export class JsonFileManager {
             promiseArray.push(this.getFileState(this.directories.mainDirectoryPath + this.declaredDataFileNames[key], key));
         });
 
-        let invmState: InventoryState = {
+        const invmState: InventoryState = {
             allocations: [],
             conditions: [],
             items: [],
@@ -153,26 +127,6 @@ export class JsonFileManager {
         }, invmState);
     }
 
-    /**
-     * Get a singular file state for a specific type.
-     * @param path {string} - The path of the file to collect data from. Must be JSON.
-     * @param type {string} - The type of data to be collected - for logging purposes
-     * @private
-     */
-    private getFileState(path: string, type: string): Promise<fileReadResults> {
-        this.logger.debug(`Fetching for path '${path}' type '${type}' `);
-        return new Promise((resolve, reject) => {
-            fs.readFile(path, 'utf-8',(err, data) => {
-                this.logger.debug('Received', data, err);
-                if (err) {
-                    this.logger.error('Failed to get file data!', err);
-                    return reject(err);
-                }
-                this.logger.debug(`Collected file ${path}; ${type}`);
-                resolve({data: JSON.parse(data), type});
-            });
-        });
-    }
     //#endregion
 
     //#region Save
@@ -195,12 +149,60 @@ export class JsonFileManager {
     }
 
     /**
+     * Takes the paths provided and queries via {@link checkPathExists} to see if the path exists
+     * @param pathsToCheck {string[]}
+     * @private
+     */
+    private async checkPaths(pathsToCheck: string[]) {
+        const checkingPromises: Promise<{ path: string, val: boolean }>[] = [];
+        pathsToCheck.forEach((i) => {
+            checkingPromises.push(this.checkPathExists(i));
+        });
+        const values_1 = await Promise.all(checkingPromises);
+        if (values_1.find((i_1) => !i_1.val)) {
+            this.logger.warn('Not all paths were valid');
+            values_1.forEach((i_2) => {
+                if (i_2.val) {
+                    this.logger.trace(`Path ${i_2.path} - ${i_2.val}`);
+                } else {
+                    this.logger.debug(`Path ${i_2.path} does not exist`);
+                }
+            });
+            return false;
+        }
+        return true;
+    }
+
+    //#endregion
+
+    /**
+     * Get a singular file state for a specific type.
+     * @param path {string} - The path of the file to collect data from. Must be JSON.
+     * @param type {string} - The type of data to be collected - for logging purposes
+     * @private
+     */
+    private getFileState(path: string, type: string): Promise<fileReadResults> {
+        this.logger.debug(`Fetching for path '${path}' type '${type}' `);
+        return new Promise((resolve, reject) => {
+            fs.readFile(path, 'utf-8', (err, data) => {
+                this.logger.debug('Received', data, err);
+                if (err) {
+                    this.logger.error('Failed to get file data!', err);
+                    return reject(err);
+                }
+                this.logger.debug(`Collected file ${path}; ${type}`);
+                resolve({data: JSON.parse(data), type});
+            });
+        });
+    }
+
+    /**
      * Save a state object array to a path.
      * @param path {string} - Path on where to save the file
      * @param state {object[]} - The object to record
      * @private
      */
-    private saveObjectState(path: string, state: object[] | undefined): Promise<void> {
+    private saveObjectState(path?: string, state?: object[]): Promise<void> {
         if (!path || !state || !state.length) {
             this.logger.error('One of the provided items are invalid', path, state);
             return Promise.reject('The provided path or state is invalid');
@@ -214,6 +216,7 @@ export class JsonFileManager {
             });
         });
     }
+
     //#endregion
 
     //#region directory helpers
@@ -247,7 +250,7 @@ export class JsonFileManager {
      * @param path {string}
      * @private
      */
-    private checkPathExists(path: string): Promise<{path: string, val: boolean}> {
+    private checkPathExists(path: string): Promise<{ path: string, val: boolean }> {
         return new Promise((resolve) => {
             fs.access(path, (err) => {
                 if (err) {
@@ -257,6 +260,7 @@ export class JsonFileManager {
             });
         });
     }
+
     //#endregion
 }
 
@@ -268,5 +272,6 @@ export interface fileNames {
     items?: string,
     packages?: string,
     tags?: string,
-    [index: string]: any
+
+    [index: string]: string
 }

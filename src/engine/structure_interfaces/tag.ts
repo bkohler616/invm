@@ -1,9 +1,10 @@
 import {GeneralFields} from "./generalFields";
-import {AuditFields, NewAuditFields} from "./auditFields";
 import * as AuditData from "./auditFields";
+import {AuditFields, NewAuditFields} from "./auditFields";
 
 export let DefaultTagColor = '#be3228';
 export let DefaultTagImportance = 5;
+
 export interface Tag extends GeneralFields, AuditFields {
     color: string, // hex rgb
     importance: number // 0-10

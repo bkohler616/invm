@@ -1,8 +1,7 @@
-import yargs from 'yargs';
-import { Options } from 'yargs';
-import {defaultFileData} from "./defaults";
-import {Logger, LoggingSystem, LoggerSource} from "../shared/loggingSystem";
-import {Invm} from "../engine/invm";
+import yargs, {Options} from 'yargs';
+import {defaultFileData} from './defaults';
+import {Logger, LoggerSource, LoggingSystem} from '../shared/loggingSystem';
+import {Invm} from '../engine/invm';
 
 enum commands {
     ADD,
@@ -12,16 +11,17 @@ enum commands {
     CHECKIN,
     CHECKOUT
 }
+
 export class CliInterface {
     private testOptions: { [key: string]: Options; } = {
         run: {
-            type: "boolean",
+            type: 'boolean',
             default: true,
             hidden: true,
         },
         type: {
-            type: "string",
-            choices: ["allocation", "condition", "item", "package", "tag"]
+            type: 'string',
+            choices: ['allocation', 'condition', 'item', 'package', 'tag']
         }
     };
 
@@ -74,7 +74,7 @@ export class CliInterface {
             .help()
             .recommendCommands()
             .demandCommand()
-            .parseSync()
+            .parseSync();
         if (!argvv['run']) {
             console.log('Closing due to run being false.');
             process.exit();
@@ -83,10 +83,9 @@ export class CliInterface {
         await this.invm.initializeInvStateFileData();
     }
 
-    private handle(argv: yargs.ArgumentsCamelCase, command: commands ) {
+    private handle(argv: yargs.ArgumentsCamelCase, command: commands) {
         this.logger.debug(`${command} - ${JSON.stringify(argv)}`);
-        if (command === commands.ADD) {
-
+        if (command === commands.ADD) { /* empty */
         }
     }
 }
