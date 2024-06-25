@@ -1,9 +1,9 @@
-import {Allocation, Checkin, Checkout, Condition, Item, Package, Tag} from "./structure_interfaces";
-import {FileData} from "./file-state-managers/fileData";
-import {FileType} from "./file-state-managers/fileType";
-import {JsonFileManager} from "./file-state-managers/jsonFileManager";
-import {Logger} from "log4js";
-import {LoggerSource, LoggingSystem} from "../shared/loggingSystem";
+import {Allocation, Checkin, Checkout, Condition, Item, Package, Tag} from './structure_interfaces';
+import {FileData} from './file-state-managers/fileData';
+import {FileType} from './file-state-managers/fileType';
+import {JsonFileManager} from './file-state-managers/jsonFileManager';
+import {Logger} from 'log4js';
+import {LoggerSource, LoggingSystem} from '../shared/loggingSystem';
 
 export class InventoryStateManager {
     private invmState: InventoryState = {
@@ -14,7 +14,7 @@ export class InventoryStateManager {
         tags: [],
         checkouts: [],
         checkins: [],
-    }
+    };
     private logger: Logger;
 
     constructor(initialState?: InventoryState) {
@@ -74,7 +74,7 @@ export class InventoryStateManager {
     private async loadFromJsonFiles(fileData: FileData): Promise<void> {
         const jsonFileMan = new JsonFileManager(fileData);
         const isLoadable = await jsonFileMan.isLoadable();
-        this.invmState = await (isLoadable ? jsonFileMan.getFullState() : Promise.reject("Could not load"));
+        this.invmState = await (isLoadable ? jsonFileMan.getFullState() : Promise.reject('Could not load'));
     }
 
     private async initializeJsonFiles(fileData: FileData, force: boolean = false): Promise<void> {

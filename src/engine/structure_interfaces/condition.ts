@@ -1,6 +1,7 @@
-import {GeneralFields} from "./generalFields";
-import * as AuditData from "./auditFields";
-import {AuditFields, NewAuditFields} from "./auditFields";
+import {GeneralFields} from './generalFields';
+import * as AuditData from './auditFields';
+import {AuditFields, NewAuditFields} from './auditFields';
+import {Options} from 'yargs';
 
 export let DefaultCostModifier = 100;
 export let DefaultImportanceModifier = 5;
@@ -30,5 +31,12 @@ export function createCondition(request: NewCondition): Condition {
         color: request.color || DefaultColor,
         importance: request.importance || DefaultImportanceModifier,
         cost_modifier: request.cost_modifier || DefaultCostModifier
-    }
+    };
 }
+
+
+export const conditionRequiredKeys: { [key: string]: Options; } = {
+    name: {
+        type: 'string'
+    }
+};

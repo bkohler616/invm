@@ -1,4 +1,4 @@
-import {AuditFields} from "./auditFields";
+import {AuditFields} from './auditFields';
 
 export interface Checkin extends AuditFields {
     checkout_reference: string, //allocation_id

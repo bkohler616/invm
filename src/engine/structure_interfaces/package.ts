@@ -1,6 +1,7 @@
-import {GeneralFields} from "./generalFields";
-import * as AuditData from "./auditFields";
-import {AuditFields, NewAuditFields} from "./auditFields";
+import {GeneralFields} from './generalFields';
+import * as AuditData from './auditFields';
+import {AuditFields, NewAuditFields} from './auditFields';
+import {Options} from 'yargs';
 
 export interface Package extends GeneralFields, AuditFields {
     items: string[], // item_ids
@@ -22,3 +23,9 @@ export function createPackage(request: NewPackage): Package {
         tags: request.tags?.length ? request.tags : []
     };
 }
+
+export const packageRequiredKeys: { [key: string]: Options; } = {
+    name: {
+        type: 'string'
+    },
+};

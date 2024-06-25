@@ -1,6 +1,7 @@
-import {GeneralFields} from "./generalFields";
-import * as AuditData from "./auditFields";
-import {AuditFields, NewAuditFields} from "./auditFields";
+import {GeneralFields} from './generalFields';
+import * as AuditData from './auditFields';
+import {AuditFields, NewAuditFields} from './auditFields';
+import {Options} from 'yargs';
 
 export let DefaultTagColor = '#be3228';
 export let DefaultTagImportance = 5;
@@ -25,3 +26,9 @@ export function createTag(request: NewTag): Tag {
         importance: request.importance || DefaultTagImportance,
     };
 }
+
+export const tagRequiredKeys: { [key: string]: Options; } = {
+    name: {
+        type: 'string'
+    },
+};

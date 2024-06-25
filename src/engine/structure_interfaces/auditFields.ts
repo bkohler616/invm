@@ -1,6 +1,6 @@
-import type {UUID} from "crypto";
-import {randomUUID} from "crypto";
-import {addedBy} from "../enums/addedBy";
+import type {UUID} from 'crypto';
+import {randomUUID} from 'crypto';
+import {addedBy} from '../enums/addedBy';
 
 export interface AuditFields {
     id: UUID, // unique ID for matching / adding.
@@ -27,5 +27,5 @@ export function createAuditData(request: NewAuditFields): AuditFields {
         added_by: request.added_by || addedBy.Unknown,
         last_modified_by: request.added_by || addedBy.Unknown,
         is_removed: false,
-    }
+    };
 }

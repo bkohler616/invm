@@ -1,7 +1,8 @@
-import * as AuditData from "./auditFields";
-import {AuditFields, NewAuditFields} from "./auditFields";
-import {GeneralFields} from "./generalFields";
-import {DefaultAllocationImportance} from "./allocation";
+import * as AuditData from './auditFields';
+import {AuditFields, NewAuditFields} from './auditFields';
+import {GeneralFields} from './generalFields';
+import {DefaultAllocationImportance} from './allocation';
+import {Options} from 'yargs';
 
 export interface Item extends AuditFields, GeneralFields {
     tags: string[], //tag_ids
@@ -49,5 +50,15 @@ export function createItem(request: NewItem): Item {
         link_to_product: request.link_to_product || '',
         package: request.package || '',
         barcode_id: request.barcode_id || '',
-    }
+    };
 }
+
+
+export const itemRequiredKeys: { [key: string]: Options; } = {
+    name: {
+        type: 'string'
+    },
+    current_allocation: {
+        type: 'string'
+    },
+};

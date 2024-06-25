@@ -1,7 +1,8 @@
 import * as AuditData from './auditFields';
-import {GeneralFields} from "./generalFields";
+import {GeneralFields} from './generalFields';
+import {Options} from 'yargs';
 
-export let DefaultAllocationImportance = 5;
+export const DefaultAllocationImportance = 5;
 
 export interface Allocation extends AuditData.AuditFields, GeneralFields {
     tags: string[], //tag ids
@@ -27,5 +28,19 @@ export function createAllocation(request: NewAllocation): Allocation {
         importance: request.importance || DefaultAllocationImportance,
         sub_allocation: request.sub_allocation || '',
         is_controlled: request.is_controlled,
-    }
+    };
 }
+
+export const allocationRequiredKeys: { [key: string]: Options; } = {
+    name: {
+        type: 'string',
+        description: 'Name of the thing to add.'
+    },
+    tags: {
+        type: 'array',
+        description: 'Array of tags'
+    },
+    is_controlled: {
+        type: 'boolean'
+    }
+};

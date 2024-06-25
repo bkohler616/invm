@@ -37,10 +37,10 @@ export function addFunctionCaller(binder: ThisParameterType<Function>, funcToWra
             args.splice(1, 0, stackTrace);
             return [
                 ...args
-            ]
+            ];
         },
         modifiesReturnValue: true
-    }
+    };
 
     return wrapFunction(funcToWrap.bind(binder), preFunc);
 }

@@ -1,5 +1,5 @@
-import {InventoryStateManager} from "./inv_state_manager";
-import {FileData} from "./file-state-managers/fileData";
+import {InventoryStateManager} from './inv_state_manager';
+import {FileData} from './file-state-managers/fileData';
 
 export class Invm {
     private fileData: FileData;
