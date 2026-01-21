@@ -61,7 +61,7 @@ export class InventoryStateManager {
     //#region JSON file handlers
     private async saveJsonFiles(fileData: FileData, force: boolean = false): Promise<void> {
         const jsonFileMan = new JsonFileManager(fileData);
-        let isSetup = await jsonFileMan.isDataDirectorySetup();
+        const isSetup = await jsonFileMan.isDataDirectorySetup();
         if (isSetup && !force) {
             throw 'Data already exists, did not save';
         }
@@ -79,7 +79,7 @@ export class InventoryStateManager {
 
     private async initializeJsonFiles(fileData: FileData, force: boolean = false): Promise<void> {
         const jsonFileMan = new JsonFileManager(fileData);
-        let isLoadable = await jsonFileMan.isLoadable();
+        const isLoadable = await jsonFileMan.isLoadable();
         if (isLoadable && !force) {
             throw 'Data already exists, did not re-initialize';
         }

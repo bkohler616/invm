@@ -6,4 +6,5 @@ export interface FileData {
     configsDirectory: string,
     dataDirectory: string,
     logDirectory: string,
+    fullDataDirectory: string,
 }

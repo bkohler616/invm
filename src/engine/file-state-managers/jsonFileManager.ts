@@ -138,7 +138,7 @@ export class JsonFileManager {
         const allFiles: Promise<void>[] = [];
         Object.keys(state).forEach((key) => {
             if (state[key]) {
-                allFiles.push(this.saveObjectState(this.declaredDataFileNames[key], state[key])
+                allFiles.push(this.saveObjectState(this.directories.mainDirectoryPath + this.declaredDataFileNames[key], state[key])
                     .catch((err) => {
                         this.logger.error(`When saving ${key}, we got an error`, err);
                     }));
@@ -203,7 +203,7 @@ export class JsonFileManager {
      * @private
      */
     private saveObjectState(path?: string, state?: object[]): Promise<void> {
-        if (!path || !state || !state.length) {
+        if (!path || !state) { // || !state.length ?
             this.logger.error('One of the provided items are invalid', path, state);
             return Promise.reject('The provided path or state is invalid');
         }

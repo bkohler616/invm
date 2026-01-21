@@ -1,12 +1,12 @@
 // import {allKeysData} from '../../engine/structure_interfaces';
 import {input} from '@inquirer/prompts';
-import yargs from 'yargs';
+import {ParsableArguments} from '../interfaces/parsableArguments';
 
 export class Inquiry {
     private static instance: Inquiry;
 
     private commandType: CommandType;
-    private providedInfo: yargs.ArgumentsCamelCase;
+    private providedInfo: ParsableArguments;
     private prompts: {
         message: string,
         inquirerType: string,
@@ -14,13 +14,13 @@ export class Inquiry {
     }[] = [];
     private collectedResults: {[key: string]: string | number} = {};
 
-    constructor(commandType: CommandType, providedInfo: yargs.ArgumentsCamelCase) {
+    constructor(commandType: CommandType, providedInfo: ParsableArguments) {
         this.commandType = commandType;
         this.providedInfo = providedInfo;
         this.cleanupProvidedParameters();
     }
 
-    public static getInstance(commandType?: CommandType, providedInfo?: yargs.ArgumentsCamelCase): Inquiry {
+    public static getInstance(commandType?: CommandType, providedInfo?: ParsableArguments): Inquiry {
         if (commandType && providedInfo) {
             Inquiry.instance = new Inquiry(commandType, providedInfo);
         }
@@ -43,23 +43,22 @@ export class Inquiry {
     }
 
     private cleanupProvidedParameters() {
-        if (!this.providedInfo.name) {
+        if (!this.providedInfo.name && this.commandType !== CommandType.LIST) {
             this.prompts.push({
                 message: `Enter the name of the ${this.providedInfo.type}`,
                 inquirerType: 'input',
                 inquirerData: 'name',
             });
-        } else {
-            this.collectedResults['name'] = this.providedInfo.name;
         }
+        if (this.providedInfo.name) { this.collectedResults['name'] = this.providedInfo.name; }
     }
 
-    private getArgData() {
-        const argData = {};
-        if (this.providedInfo.name) {
-
-        }
-    }
+    // private getArgData() {
+    //     const argData = {};
+    //     if (this.providedInfo.name) {
+    //
+    //     }
+    // }
 
 }
 
